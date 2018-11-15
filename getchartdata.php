@@ -18,7 +18,7 @@ for ($i = 0; $i < count($sensor); $i++){
     ) tmp
     WHERE rownum MOD 5 = 0
     ";
-    // rownum - выбираем каждую 5 строчку
+    // rownum mod 5 - выбираем каждую 5 строчку
     if (count($sensor) > 1 && $i != count($sensor) - 1 ){
         $sql = $sql."
         UNION
@@ -39,8 +39,10 @@ if (mysqli_num_rows($result) > 0) {
     // output data of each row
     while($row = mysqli_fetch_assoc($result)) {
         array_push($labels, $row['vdatetime']);
-        array_push($data,  $row['value']);
+        $data[$row['id_sensor']] = array();
+        array_push($data[$row['id_sensor']], $row['value']);
     }
+    print_r($data);
     $dataset1['label'] = 't_pod';
     $dataset1['data'] = $data;
     array_push($dataset, $dataset1);
@@ -50,7 +52,7 @@ if (mysqli_num_rows($result) > 0) {
 
 	$json = json_encode($final); 
 
-	echo $json;
+	// echo $json;
 } else {
     echo "[]";
 }
