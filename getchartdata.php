@@ -3,6 +3,7 @@ include 'dbconnect.php';
 
 $interval = $_GET['interval'] ?? 3;
 $sensor =  $_GET['sensor'] ?? [1];
+$dataperiod = $_GET['period'] ?? 5;
 
 $final = array();
 $dataset = array();
@@ -20,7 +21,7 @@ for ($i = 0; $i < count($sensor); $i++){
     vdatetime BETWEEN now()-INTERVAL $interval HOUR AND now()
     ORDER BY vdatetime ASC
     ) tmp
-    WHERE rownum MOD 5 = 0
+    WHERE rownum MOD $dataperiod = 0
     ";
 
     // rownum mod 5 - выбираем каждую 5 строчку
