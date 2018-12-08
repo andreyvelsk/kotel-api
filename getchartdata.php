@@ -10,11 +10,23 @@ $dataset = array();
 $dataset_data = array();
 
 for ($i = 0; $i < count($sensor); $i++){
+
+    $labelname='sensor'.$sensor[$i];
+    $sql_labelname = "
+    SELECT s.name FROM sensors s WHERE s.id = $sensor[$i];
+    ";
+    $result_labelname = mysqli_query($conn, $sql_labelname);
+    if(mysqli_num_rows($result_labelname) > 0) {
+        while($row = mysqli_fetch_assoc($result_labelname)){
+            $labelname=$row['name'];
+        }
+    }
+
     $data = array();
     $labels = array();
     $sql = "
-    SELECT id_sensor, value, vdatetime FROM ( 
-    SELECT @row := @row +1 AS rownum, id_sensor, value, vdatetime
+    SELECT value, vdatetime FROM ( 
+    SELECT @row := @row +1 AS rownum, value, vdatetime
     FROM (
     SELECT @row :=0) r, value 
     WHERE id_sensor = $sensor[$i] AND
@@ -23,8 +35,8 @@ for ($i = 0; $i < count($sensor); $i++){
     ) tmp
     WHERE rownum MOD $dataperiod = 0
     ";
-
     // rownum mod 5 - выбираем каждую 5 строчку
+
     $result = mysqli_query($conn, $sql);
     if (mysqli_num_rows($result) > 0) {
         while($row = mysqli_fetch_assoc($result)) {
@@ -32,7 +44,7 @@ for ($i = 0; $i < count($sensor); $i++){
             array_push($data, $row['value']);
             }
 
-            $dataset_data['label'] = 't_pod'.$i;
+            $dataset_data['label'] = $labelname;
             $dataset_data['data'] = $data;
             array_push($dataset, $dataset_data);
     }
